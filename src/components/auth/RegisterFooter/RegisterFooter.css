@@ -1,0 +1,233 @@
+.register-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  padding: 16px 72px;
+
+  background: #02061766;
+  border-top: 1px solid #ffffff1a;
+
+  backdrop-filter: blur(12px);
+  box-sizing: border-box;
+}
+
+.register-footer__container {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================
+   Nội dung bên trái
+========================= */
+
+.register-footer__content {
+  display: flex;
+  align-items: center;
+
+  line-height: 16px;
+}
+
+.register-footer__copyright {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: #ffffffb2;
+}
+
+/* =========================
+   Các liên kết
+========================= */
+
+.register-footer__link {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.register-footer__link li {
+  display: flex;
+  align-items: center;
+}
+
+.register-footer__link a {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0;
+
+  color: #ffffffb2;
+  text-decoration: none;
+}
+
+.register-footer__link a:hover {
+  color: #ffffff;
+}
+
+/* Dấu phân cách */
+
+.register-footer__separator {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: #ffffff4d;
+}
+
+/* =========================
+   Số trang bên phải
+========================= */
+
+.register-footer__page-number {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+/* =========================
+   Button chung
+========================= */
+
+.register-footer__page-button {
+  border: none;
+  margin: 0;
+
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0;
+
+  text-align: center;
+  vertical-align: middle;
+
+  cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.register-footer__page-button--01 {
+  padding: 2px 8px;
+
+  font-weight: 600;
+  color: #ffffffb2;
+  background-color: transparent;
+}
+
+.register-footer__page-button--01:hover {
+  color: #ffffff;
+}
+
+.register-footer__page-button--02 {
+  padding: 2px 8px;
+
+  background: #ee4d2d;
+
+  box-shadow: 0px 1px 2px 0px #0000000d;
+
+  color: #ffffff;
+
+  font-weight: 700;
+}
+
+.register-footer__page-button--02:hover {
+  color: #ffffff;
+}
+
+/* =========================
+   Đường gạch
+========================= */
+
+.register-footer__page-line {
+  width: 32px;
+  height: 2px;
+
+  border-radius: 9999px;
+
+  background: #ffffffcc;
+}
+
+.register-footer__page-button--03 {
+  width: 28.41px;
+  height: 20px;
+
+  padding: 2px 6px;
+  margin-left: 4px;
+
+  border-radius: 4px;
+
+  background: transparent;
+
+  color: #ffffffb2;
+
+  font-weight: 600;
+}
+
+.register-footer__page-button--03:hover {
+  color: #ffffff;
+}
+
+/* =========================
+   Responsive 1024px
+========================= */
+
+@media (max-width: 1024px) {
+  .register-footer {
+    padding: 16px 32px;
+  }
+
+  .register-footer__link {
+    gap: 12px;
+  }
+}
+
+/* =========================
+   Responsive 768px
+========================= */
+
+@media (max-width: 768px) {
+  .register-footer {
+    height: auto;
+    min-height: 53px;
+
+    padding: 12px 20px;
+  }
+
+  .register-footer__container {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .register-footer__content {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .register-footer__copyright {
+    margin-right: 8px;
+  }
+
+  .register-footer__link {
+    gap: 8px;
+  }
+
+  .register-footer__page-number {
+    gap: 8px;
+  }
+
+  .register-footer__page-line {
+    width: 20px;
+  }
+}

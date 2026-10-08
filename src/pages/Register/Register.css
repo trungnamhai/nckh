@@ -1,0 +1,35 @@
+.register-page {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background-image: url("../../assets/images/register-background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  position: relative;
+}
+
+.register-page::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(2, 6, 23, 0.75) 0%,
+    rgba(15, 23, 42, 0.4) 50%,
+    rgba(2, 6, 23, 0.85) 100%
+  );
+
+  pointer-events: none;
+}
+
+.register-page > * {
+  position: relative;
+  z-index: 1;
+}

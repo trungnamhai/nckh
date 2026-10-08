@@ -1,0 +1,506 @@
+/* =========================
+   MAIN
+========================= */
+body {
+  font-family: "Be Vietnam Pro", sans-serif;
+}
+
+.main-container {
+  width: 100%;
+  min-height: 100vh;
+
+  background: #f8fafc;
+}
+
+.right-auth-section {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 32px;
+  box-sizing: border-box;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header-top-bar {
+  width: 100%;
+  padding: 0 32px;
+  box-sizing: border-box;
+}
+
+.logo-nexora-container {
+  width: 100%;
+  max-width: 1152px;
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+
+.logo-nexora {
+  display: block;
+  width: 126px;
+  height: 36px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.center-card-otp-container {
+  flex: 1;
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 0;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+}
+
+.center-card-otp-form {
+  width: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  background: #ffffff;
+
+  border-radius: 24px;
+  border: 1px solid #f1f5f9e5;
+
+  box-shadow: 0px 20px 45px -10px #00000012;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.icon-header-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.heading-2-title {
+  width: 100%;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+
+.heading-2-title-text {
+  margin: 0;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.6px;
+  color: #0f172a;
+}
+
+.heading-2-title-dot {
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 32px;
+
+  letter-spacing: -0.6px;
+  color: var(--color-primary);
+}
+
+/* =========================
+   DESCRIPTION
+========================= */
+.description-container {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  gap: 2.3px;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 3.25px;
+  text-align: center;
+}
+
+.description-text {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22.75px;
+
+  color: #475569;
+}
+
+/* =========================
+   RECIPIENT
+========================= */
+
+.recipient-email {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 22.75px;
+  letter-spacing: -0.35px;
+  color: #0f172a;
+}
+
+.recipient-phone {
+  margin: 0;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: #94a3b8;
+}
+
+/* =========================
+   OTP TIMER (hiệu lực OTP)
+========================= */
+
+.otp-timer-note {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 5px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.timer-value {
+  color: var(--color-primary);
+
+  font-weight: 700;
+}
+
+.timer-warning {
+  color: #dc2626;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-element {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.otp-input-container {
+  width: 100%;
+
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.otp-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.6px;
+  color: #64748b;
+}
+
+/* =========================
+   6 Ô NHẬP OTP
+   (nhắm vào thẻ input nằm trong .otp-input-container
+   nên không phụ thuộc tên class bên trong OtpInput)
+========================= */
+
+.otp-input-container div:has(> input) {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+}
+
+.otp-input-container input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 56px;
+  padding: 0;
+  box-sizing: border-box;
+
+  text-align: center;
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  caret-color: var(--color-primary);
+
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  outline: none;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+}
+
+.otp-input-container input:focus {
+  background: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    0 0 0 4px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.otp-input-container input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.error-message {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin: 0;
+
+  color: #dc2626;
+
+  font-size: 13px;
+}
+
+.error-icon {
+  font-size: 14px;
+}
+
+/* =========================
+   RESEND INFO
+========================= */
+
+.resend-row {
+  width: 100%;
+  height: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resend-info {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  color: #64748b;
+}
+
+.resend-text {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.resend-icon {
+  font-size: 14px;
+  color: var(--color-primary);
+}
+
+.resend-timer-value {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-primary);
+  line-height: 20px;
+  letter-spacing: 0.7px;
+}
+
+/* =========================
+   RESEND BUTTON
+========================= */
+
+.btn-resend {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  color: #94a3b8;
+
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.btn-resend:disabled {
+  cursor: not-allowed;
+}
+
+/* =========================
+   VERIFY BUTTON
+========================= */
+
+.btn-verify {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 48px;
+
+  border: none;
+  border-radius: 4px;
+
+  box-shadow: 0px 10px 25px -3px #ee4d2d59;
+
+  background: var(--color-primary);
+
+  color: #ffffff;
+
+  font-weight: 600;
+  font-size: 16px;
+
+  cursor: pointer;
+
+  transition:
+    filter 0.2s,
+    opacity 0.2s;
+}
+
+/* =========================
+   BACK BUTTON
+========================= */
+
+.link-back {
+  width: 100%;
+  display: flex;
+  gap: 11.5px;
+
+  padding-top: 12px;
+  text-decoration: none;
+  justify-content: center;
+  align-items: center;
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+
+  color: #64748b;
+}
+
+.link-back:hover {
+  color: #0f172a;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.right-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 16px 19px;
+
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 19.5px;
+  letter-spacing: 0px;
+  color: #94a3b8;
+}
+
+.right-footer__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.right-footer__text {
+  color: #94a3b8;
+}
+
+.right-footer__link {
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+.right-footer__link:hover {
+  text-decoration: underline;
+}
+
+.right-footer__separator {
+  color: #94a3b8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .right-auth-section {
+    padding: 16px;
+  }
+
+  .header-top-bar {
+    height: 64px;
+
+    padding: 16px 20px;
+  }
+
+  .logo-nexora-container {
+    padding: 0;
+  }
+
+  .center-card-otp-container {
+    padding: 24px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-container {
+    width: 100%;
+  }
+  .center-card-otp-form {
+    padding: 32px 20px;
+    gap: 24px;
+    border-radius: 20px;
+  }
+
+  .otp-input-container div:has(> input) {
+    gap: 8px;
+  }
+
+  .otp-input-container input {
+    height: 48px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+}
