@@ -56,8 +56,7 @@ export default function AuthLayout() {
       return;
     }
 
-    // Tạm thời bỏ qua Backend
-    navigate(ROUTES.REGISTER_OTP);
+    void navigate(ROUTES.REGISTER_OTP);
   };
 
   return (

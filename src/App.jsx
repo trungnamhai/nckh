@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Register from "./pages/Register/Register";
 import RegisterOtp from "./pages/RegisterOtp/RegisterOtp";
+import RegisterSuccess from "./pages/RegisterSuccess/RegisterSuccess";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ForgotPasswordOtp from "./pages/ForgotPasswordOtp/ForgotPasswordOtp";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
@@ -16,6 +17,8 @@ function App() {
         <Route path={ROUTES.REGISTER} element={<Register />} />
 
         <Route path={ROUTES.REGISTER_OTP} element={<RegisterOtp />} />
+
+        <Route path={ROUTES.REGISTER_SUCCESS} element={<RegisterSuccess />} />
 
         <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
 

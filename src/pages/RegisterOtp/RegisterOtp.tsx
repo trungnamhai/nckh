@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import nexora from "../../assets/images/nexora.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import "./RegisterOtp.css";
 import OtpInput from "../../components/auth/RegisterOtp/OtpInput";
@@ -18,6 +18,7 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
   onSuccess,
   onBackClick,
 }) => {
+  const navigate = useNavigate();
   // =========================
   // STATE
   // =========================
@@ -238,57 +239,38 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
   const handleVerify = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Chưa gửi OTP
     if (!isOtpSent) {
       setError("Vui lòng nhấn gửi mã OTP trước");
-
       return;
     }
 
-    // OTP hết hạn
     if (otpExpired) {
       setError("Mã OTP đã hết hạn, vui lòng gửi lại mã mới");
-
       return;
     }
 
-    // Ghép 6 ô thành 1 chuỗi
     const otpValue = otp.join("");
 
-    // Chưa đủ 6 số
     if (otpValue.length !== 6) {
       setError("Vui lòng nhập đầy đủ 6 chữ số");
-
       return;
     }
 
     setIsVerifying(true);
 
-    // =========================
-    // GIẢ LẬP API
-    // =========================
-
-    setTimeout(() => {
-      // OTP test
+    // Giả lập API xác thực OTP
+    window.setTimeout(() => {
       if (otpValue === "123456") {
         setError("");
-
-        // Nếu component cha truyền onSuccess
-        if (onSuccess) {
-          onSuccess();
-        } else {
-          alert("Xác thực OTP thành công!");
-        }
-
-        // Reset OTP
         setOtp(["", "", "", "", "", ""]);
 
-        // Focus ô đầu tiên
-        inputRefs.current[0]?.focus();
-      } else {
-        setError("OTP không chính xác");
+        onSuccess?.();
+
+        navigate("/register/otp/success");
+        return;
       }
 
+      setError("OTP không chính xác");
       setIsVerifying(false);
     }, 500);
   };
