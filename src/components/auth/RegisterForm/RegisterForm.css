@@ -233,10 +233,6 @@
   display: none;
 }
 
-.register-card__input::-webkit-textfield-decoration-container {
-  display: none;
-}
-
 /* ==================== PASSWORD EYE ==================== */
 
 .register-card__eye-button {
