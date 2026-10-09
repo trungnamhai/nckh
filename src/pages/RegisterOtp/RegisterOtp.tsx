@@ -1,9 +1,41 @@
-import React, { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ClipboardEvent,
+  type KeyboardEvent,
+  type SyntheticEvent,
+} from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import nexora from "../../assets/images/nexora.png";
-import { Link, useNavigate } from "react-router-dom";
+import OtpInput from "../../components/auth/RegisterOtp/OtpInput";
+import { ROUTES } from "../../constants/routes";
 
 import "./RegisterOtp.css";
-import OtpInput from "../../components/auth/RegisterOtp/OtpInput";
+
+// =========================
+// CONSTANTS
+// =========================
+
+const OTP_LENGTH = 6;
+const OTP_LIFETIME_SECONDS = 180; // OTP có hiệu lực 3 phút
+const RESEND_COOLDOWN_SECONDS = 60; // Chờ 60 giây mới được gửi lại
+
+// Giả lập API xác thực, thay bằng lời gọi API thật
+const MOCK_OTP = "123456";
+
+const MESSAGES = {
+  incomplete: "Vui lòng nhập đầy đủ thông tin",
+  wrong: "OTP không chính xác",
+  expired: "Mã OTP đã hết hạn, vui lòng gửi lại mã mới",
+};
+
+const createEmptyOtp = () => Array<string>(OTP_LENGTH).fill("");
+
+// =========================
+// TYPES
+// =========================
 
 interface OTPVerificationProps {
   email?: string;
@@ -12,40 +44,115 @@ interface OTPVerificationProps {
   onBackClick?: () => void;
 }
 
-const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
-  email = "nguyenvana***@gmail.com",
-  phone = "+84 912***678",
+// Dữ liệu trang Đăng ký truyền sang qua navigate(..., { state })
+interface OtpLocationState {
+  email?: string;
+  phone?: string;
+}
+
+// =========================
+// HELPERS
+// =========================
+
+const formatTime = (seconds: number): string => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
+
+// nguyenvanabc@gmail.com -> nguyenvana***@gmail.com
+const maskEmail = (email: string): string => {
+  const [name, domain] = email.split("@");
+
+  if (!name || !domain) {
+    return email;
+  }
+
+  return `${name.slice(0, 9)}***@${domain}`;
+};
+
+// 0912345678 -> +84 912***678
+const maskPhone = (phone: string): string => {
+  if (phone.length < 7) {
+    return phone;
+  }
+
+  return `+84 ${phone.slice(1, 4)}***${phone.slice(-3)}`;
+};
+
+// Đếm ngược theo giây, restart() để đếm lại từ đầu
+function useCountdown(initialSeconds: number) {
+  const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
+  const [runId, setRunId] = useState(0);
+
+  const running = secondsLeft > 0;
+
+  useEffect(() => {
+    if (!running) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setSecondsLeft((prev) => Math.max(prev - 1, 0));
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [running, runId]);
+
+  const restart = (seconds: number) => {
+    setSecondsLeft(seconds);
+    setRunId((prev) => prev + 1);
+  };
+
+  return { secondsLeft, restart };
+}
+
+// =========================
+// COMPONENT
+// =========================
+
+export default function RegisterOtpVerification({
+  email: emailProp = "nguyenvana***@gmail.com",
+  phone: phoneProp = "+84 912***678",
   onSuccess,
-  onBackClick,
-}) => {
+}: Readonly<OTPVerificationProps>) {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Email / SĐT người dùng vừa đăng ký (nếu có), không có thì dùng giá trị mặc định
+  const locationState = location.state as OtpLocationState | null;
+  const email = locationState?.email
+    ? maskEmail(locationState.email)
+    : emailProp;
+  const phone = locationState?.phone
+    ? maskPhone(locationState.phone)
+    : phoneProp;
+
   // =========================
   // STATE
   // =========================
 
   // Lưu 6 số OTP
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState<string[]>(createEmptyOtp);
 
-  // Lưu thông báo lỗi
+  // Lỗi do người dùng thao tác (chưa đủ số, sai OTP)
   const [error, setError] = useState("");
-
-  // Đã bấm gửi OTP lần nào chưa
-  // Chỉ khi đã gửi thì đồng hồ OTP mới bắt đầu chạy
-  const [isOtpSent, setIsOtpSent] = useState(false);
-
-  // Thời gian OTP còn hiệu lực
-  // Ban đầu là 0 vì chưa gửi, sau khi gửi sẽ là 180 giây = 3 phút
-  const [otpTimeLeft, setOtpTimeLeft] = useState(0);
-
-  // Thời gian chờ trước khi gửi lại OTP
-  const [resendTimeLeft, setResendTimeLeft] = useState(0);
 
   // Trạng thái đang xác thực
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // OTP chỉ được coi là hết hạn khi ĐÃ gửi
-  // và thời gian đã về 0 (chưa gửi thì không tính là hết hạn)
-  const otpExpired = isOtpSent && otpTimeLeft <= 0;
+  // OTP đã được gửi ngay sau khi đăng ký thành công,
+  // nên cả hai đồng hồ chạy ngay khi vào trang
+  const otpTimer = useCountdown(OTP_LIFETIME_SECONDS);
+  const resendTimer = useCountdown(RESEND_COOLDOWN_SECONDS);
+
+  const otpExpired = otpTimer.secondsLeft <= 0;
+
+  // Hết hạn thì ưu tiên hiện thông báo hết hạn
+  const message = otpExpired ? MESSAGES.expired : error;
 
   // =========================
   // REF
@@ -54,82 +161,11 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // =========================
-  // OTP TIMER
-  // =========================
-
-  useEffect(() => {
-    if (!isOtpSent || otpTimeLeft <= 0) {
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setOtpTimeLeft((prev) => {
-        if (prev <= 1) {
-          setError("Mã OTP đã hết hạn, vui lòng gửi lại mã mới");
-          return 0;
-        }
-
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [isOtpSent, otpTimeLeft]);
-  // =========================
-  // RESEND TIMER
-  // =========================
-
-  useEffect(() => {
-    // Không còn thời gian chờ
-    if (resendTimeLeft <= 0) {
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setResendTimeLeft((prev) => {
-        if (prev <= 1) {
-          return 0;
-        }
-
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [resendTimeLeft]);
-
-  // =========================
-  // FORMAT TIME
-  // =========================
-
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-
-    const remainingSeconds = seconds % 60;
-
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
-  // =========================
   // NHẬP OTP
   // =========================
 
   const handleOTPChange = (index: number, value: string) => {
-    // Chưa gửi OTP
-    if (!isOtpSent) {
-      setError("Vui lòng nhấn gửi mã OTP trước");
-
-      return;
-    }
-
-    // OTP đã hết hạn
     if (otpExpired) {
-      setError("Mã OTP đã hết hạn, vui lòng gửi lại mã mới");
-
       return;
     }
 
@@ -148,9 +184,8 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
     // Xóa lỗi khi người dùng nhập lại
     setError("");
 
-    // Nếu đã nhập số
-    // chuyển sang ô tiếp theo
-    if (value && index < 5) {
+    // Đã nhập số thì chuyển sang ô tiếp theo
+    if (value && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -159,36 +194,26 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
   // BACKSPACE
   // =========================
 
-  const handleKeyDown = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Backspace") {
       return;
     }
 
-    // Nếu ô hiện tại đang trống
-    // thì quay lại ô trước
+    const newOtp = [...otp];
+
+    // Ô hiện tại đang trống thì xóa ô trước và quay lại ô trước
     if (!otp[index]) {
       if (index > 0) {
-        const newOtp = [...otp];
-
         newOtp[index - 1] = "";
-
         setOtp(newOtp);
-
         inputRefs.current[index - 1]?.focus();
       }
 
       return;
     }
 
-    // Nếu ô hiện tại có số
-    // thì xóa số
-    const newOtp = [...otp];
-
+    // Ô hiện tại có số thì xóa số
     newOtp[index] = "";
-
     setOtp(newOtp);
   };
 
@@ -196,16 +221,19 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
   // PASTE OTP
   // =========================
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
 
-    // Lấy dữ liệu được paste
-    const pastedData = e.clipboardData.getData("text");
+    if (otpExpired) {
+      return;
+    }
 
-    // Chỉ lấy số
-    const digits = pastedData.replace(/\D/g, "").slice(0, 6);
+    // Chỉ lấy số trong dữ liệu được paste
+    const digits = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, OTP_LENGTH);
 
-    // Không có số
     if (!digits) {
       return;
     }
@@ -214,45 +242,32 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
 
     // Điền từng số vào từng ô
     digits.split("").forEach((digit, index) => {
-      if (index < 6) {
-        newOtp[index] = digit;
-      }
+      newOtp[index] = digit;
     });
 
     setOtp(newOtp);
-
-    // Paste đủ 6 số
-    if (digits.length === 6) {
-      inputRefs.current[5]?.focus();
-    } else {
-      // Chưa đủ thì focus ô tiếp theo
-      inputRefs.current[Math.min(digits.length, 5)]?.focus();
-    }
-
     setError("");
+
+    // Paste đủ thì focus ô cuối, chưa đủ thì focus ô tiếp theo
+    inputRefs.current[Math.min(digits.length, OTP_LENGTH - 1)]?.focus();
   };
 
   // =========================
   // XÁC THỰC OTP
   // =========================
 
-  const handleVerify = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleVerify = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!isOtpSent) {
-      setError("Vui lòng nhấn gửi mã OTP trước");
-      return;
-    }
-
+    // Hết hạn: thông báo đã hiện sẵn, người dùng phải gửi lại mã
     if (otpExpired) {
-      setError("Mã OTP đã hết hạn, vui lòng gửi lại mã mới");
       return;
     }
 
     const otpValue = otp.join("");
 
-    if (otpValue.length !== 6) {
-      setError("Vui lòng nhập đầy đủ 6 chữ số");
+    if (otpValue.length !== OTP_LENGTH) {
+      setError(MESSAGES.incomplete);
       return;
     }
 
@@ -260,51 +275,44 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
 
     // Giả lập API xác thực OTP
     window.setTimeout(() => {
-      if (otpValue === "123456") {
+      if (otpValue === MOCK_OTP) {
         setError("");
-        setOtp(["", "", "", "", "", ""]);
+        setOtp(createEmptyOtp());
 
         onSuccess?.();
 
-        navigate("/register/otp/success");
+        void navigate(ROUTES.REGISTER_SUCCESS);
         return;
       }
 
-      setError("OTP không chính xác");
+      setError(MESSAGES.wrong);
       setIsVerifying(false);
     }, 500);
   };
 
   // =========================
-  // GỬI / GỬI LẠI OTP
+  // GỬI LẠI OTP
   // =========================
 
   const handleResendOTP = () => {
-    // Nếu vẫn đang trong thời gian chờ
-    // thì không cho gửi
-    if (resendTimeLeft > 0) {
+    // Đang trong thời gian chờ thì không cho gửi
+    if (resendTimer.secondsLeft > 0) {
       return;
     }
 
-    // Reset OTP
-    setOtp(["", "", "", "", "", ""]);
+    // Gọi API gửi lại OTP ở đây
 
-    // Xóa lỗi
+    setOtp(createEmptyOtp());
     setError("");
 
-    // Đánh dấu đã gửi OTP
-    // => từ lúc này đồng hồ hiệu lực mới bắt đầu đếm
-    setIsOtpSent(true);
+    // OTP mới có hiệu lực 3 phút, 60 giây sau mới được gửi tiếp
+    otpTimer.restart(OTP_LIFETIME_SECONDS);
+    resendTimer.restart(RESEND_COOLDOWN_SECONDS);
 
-    // OTP mới có hiệu lực 3 phút
-    setOtpTimeLeft(180);
-
-    // Chờ 60 giây mới được gửi tiếp
-    setResendTimeLeft(60);
-
-    // Focus ô đầu tiên
     inputRefs.current[0]?.focus();
   };
+
+  const currentYear = new Date().getFullYear();
 
   // =========================
   // JSX
@@ -332,51 +340,47 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
             {/* Title */}
             <div className="icon-header-group">
               <div className="heading-2-title">
-                <p className="heading-2-title-text">Xác thực mã OTP</p>
-                <span className="heading-2-title-dot">.</span>
+                <h1 className="heading-2-title-text">Xác thực mã OTP</h1>
+                <span className="heading-2-title-dot" aria-hidden="true">
+                  .
+                </span>
               </div>
 
               <div className="description-container">
-                {/* Description */}
                 <p className="description-text">
                   Mã xác thực gồm 6 chữ số đã được gửi tới:
                 </p>
 
                 {/* Email + Phone */}
-
                 <p className="recipient-email">{email}</p>
                 <p className="recipient-phone">(hoặc SDT: {phone})</p>
               </div>
 
-              {/* =========================
-              OTP TIMER
-              Chỉ hiện sau khi đã bấm gửi OTP
-          ========================= */}
+              {/* Thời gian hiệu lực của OTP */}
+              <div className="otp-timer-note">
+                <span>Mã OTP có hiệu lực trong:</span>
 
-              {isOtpSent && (
-                <div className="otp-timer-note">
-                  <span>Mã OTP có hiệu lực trong:</span>
-
-                  <span
-                    className={`timer-value ${
-                      otpTimeLeft <= 60 ? "timer-warning" : ""
-                    }`}
-                  >
-                    {formatTime(otpTimeLeft)}
-                  </span>
-                </div>
-              )}
+                <span
+                  className={`timer-value${
+                    otpTimer.secondsLeft <= 60 ? " timer-warning" : ""
+                  }`}
+                >
+                  {formatTime(otpTimer.secondsLeft)}
+                </span>
+              </div>
             </div>
 
             {/* =========================
-              FORM
-          ========================= */}
+                FORM
+            ========================= */}
             <form onSubmit={handleVerify} className="form-element">
-              <div className="otp-input-container">
-                {/* Label */}
+              <div
+                className={`otp-input-container${
+                  message ? " otp-input-container--error" : ""
+                }`}
+              >
                 <p className="otp-label">NHẬP MÃ BẢO MẬT</p>
 
-                {/* OTP INPUT */}
                 <OtpInput
                   otp={otp}
                   inputRefs={inputRefs}
@@ -387,67 +391,67 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
                 />
               </div>
 
-              {/* =========================
-                ERROR
-            ========================= */}
+              {/* Thông báo lỗi */}
+              {message && (
+                <div className="error-message" role="alert">
+                  <span className="error-icon" aria-hidden="true">
+                    ⚠
+                  </span>
 
-              {error && (
-                <div className="error-message">
-                  <span className="error-icon">⚠</span>
-
-                  <span className="error-text">{error}</span>
+                  <span className="error-text">{message}</span>
                 </div>
               )}
 
-              {/* =========================
-                RESEND TIMER
-            ========================= */}
+              {/* Gửi lại mã */}
               <div className="resend-row">
                 <div className="resend-info">
-                  <i className="fa-regular fa-clock resend-icon"></i>
-                  <span className="resend-text">Gửi lại mã sau: </span>
+                  <i
+                    className="fa-regular fa-clock resend-icon"
+                    aria-hidden="true"
+                  ></i>
 
-                  {resendTimeLeft > 0 && (
+                  <span className="resend-text">
+                    {resendTimer.secondsLeft > 0
+                      ? "Gửi lại mã sau:"
+                      : "Chưa nhận được mã?"}
+                  </span>
+
+                  {resendTimer.secondsLeft > 0 && (
                     <span className="resend-timer-value">
-                      {resendTimeLeft}s
+                      {resendTimer.secondsLeft}s
                     </span>
                   )}
                 </div>
 
-                {/* =========================
-              RESEND BUTTON
-          ========================= */}
-
                 <button
                   type="button"
                   onClick={handleResendOTP}
-                  disabled={resendTimeLeft > 0}
+                  disabled={resendTimer.secondsLeft > 0}
                   className="btn-resend"
                 >
-                  {isOtpSent && <i className="fa-solid fa-rotate-right"></i>}
-                  {isOtpSent ? "Gửi lại mã" : "Gửi mã OTP"}
+                  <i
+                    className="fa-solid fa-rotate-right"
+                    aria-hidden="true"
+                  ></i>
+                  Gửi lại mã OTP
                 </button>
               </div>
 
-              {/* =========================
-                VERIFY BUTTON
-            ========================= */}
-
+              {/* Xác nhận */}
               <button
                 type="submit"
-                disabled={isVerifying || !isOtpSent || otpExpired}
+                disabled={isVerifying || otpExpired}
                 className="btn-verify"
               >
-                {isVerifying ? "Đang xác thực..." : "Xác nhận OTP"}
-                {!isVerifying && <i className="fa-solid fa-arrow-right"></i>}
+                {isVerifying ? "Đang xác thực..." : "Xác nhận"}
+                {!isVerifying && (
+                  <i className="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                )}
               </button>
 
-              {/* =========================
-              BACK BUTTON
-          ========================= */}
-
-              <Link to="/register" className="link-back">
-                <i className="fa-solid fa-arrow-left"></i>
+              {/* Quay lại */}
+              <Link to={ROUTES.REGISTER} className="link-back">
+                <i className="fa-solid fa-arrow-left" aria-hidden="true"></i>
                 Quay lại Đăng nhập / Đăng ký
               </Link>
             </form>
@@ -460,28 +464,24 @@ const RegisterOtpVerification: React.FC<OTPVerificationProps> = ({
 
         <footer className="right-footer">
           <div className="right-footer__container">
-            <span className="right-footer__text">© 2025 Nexora Inc.</span>
+            <span className="right-footer__text">
+              © {currentYear} Nexora Inc.
+            </span>
 
-            <a href="#" className="right-footer__link">
-              Bảo mật thông tin
-            </a>
-
-            <span className="right-footer__separator">•</span>
-
-            <a href="#" className="right-footer__link">
-              Điều khoản sử dụng
-            </a>
-
-            <span className="right-footer__separator">•</span>
-
-            <a href="#" className="right-footer__link">
-              Trợ giúp
-            </a>
+            <nav className="right-footer__nav" aria-label="Liên kết chân trang">
+              <Link to="/privacy" className="right-footer__link">
+                Bảo mật thông tin
+              </Link>
+              <Link to="/terms" className="right-footer__link">
+                Điều khoản sử dụng
+              </Link>
+              <Link to="/help" className="right-footer__link">
+                Trợ giúp
+              </Link>
+            </nav>
           </div>
         </footer>
       </div>
     </div>
   );
-};
-
-export default RegisterOtpVerification;
+}

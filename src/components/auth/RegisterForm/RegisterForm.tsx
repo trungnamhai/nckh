@@ -1,62 +1,254 @@
 import "./RegisterForm.css";
-import { registerUser } from "../../../services/authService";
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, type SyntheticEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import google from "../../../assets/icons/google.svg";
 import outlook from "../../../assets/icons/outlook.svg";
 
 import { ROUTES } from "../../../constants/routes";
 
-export default function AuthLayout() {
+// ==================== CONSTANTS ====================
+
+const PHONE_LENGTH = 10;
+const MIN_PASSWORD_LENGTH = 6;
+
+const SOCIAL_PROVIDERS = [
+  { name: "Google", icon: google },
+  { name: "Outlook", icon: outlook },
+];
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
+
+const UPPERCASE_REGEX = /[A-Z]/;
+const SPECIAL_CHAR_REGEX = /[^A-Za-z0-9\s]/;
+
+const MESSAGES = {
+  empty: "Vui lòng nhập đầy đủ thông tin",
+  emailInvalid: "Email không đúng định dạng",
+  emailExists:
+    "Email này đã được đăng ký, vui lòng sử dụng email khác hoặc đăng nhập",
+  phoneInvalid: `Số điện thoại không hợp lệ (vui lòng nhập đủ ${PHONE_LENGTH} chữ số)`,
+  passwordInvalid: `Mật khẩu phải có từ ${MIN_PASSWORD_LENGTH} kí tự trở lên, bao gồm kí tự in hoa và kí tự đặc biệt`,
+  confirmMismatch: "Mật khẩu không trùng khớp",
+  termRequired: "Vui lòng đồng ý với điều khoản và chính sách",
+};
+
+// ==================== TYPES ====================
+
+type FieldKey = "fullName" | "phone" | "email" | "password" | "confirmPassword";
+type FormValues = Record<FieldKey, string>;
+
+// Giá trị "" = ô bị bỏ trống
+type FormErrors = Partial<Record<FieldKey, string>>;
+
+const INITIAL_FORM: FormValues = {
+  fullName: "",
+  phone: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
+
+// ==================== VALIDATE ====================
+
+// Từ MIN_PASSWORD_LENGTH ký tự trở lên, có ít nhất 1 chữ in hoa và 1 ký tự đặc biệt
+function isStrongPassword(password: string) {
+  return (
+    password.length >= MIN_PASSWORD_LENGTH &&
+    UPPERCASE_REGEX.test(password) &&
+    SPECIAL_CHAR_REGEX.test(password)
+  );
+}
+
+function validate(form: FormValues) {
+  const errors: FormErrors = {};
+  let hasEmpty = false;
+
+  // 1. Trống dữ liệu
+  (Object.keys(form) as FieldKey[]).forEach((key) => {
+    if (!form[key].trim()) {
+      errors[key] = "";
+      hasEmpty = true;
+    }
+  });
+
+  // 2. Các ô đã nhập thì kiểm tra định dạng
+  if (errors.email === undefined && !EMAIL_REGEX.test(form.email.trim())) {
+    errors.email = MESSAGES.emailInvalid;
+  }
+
+  if (errors.phone === undefined && form.phone.length !== PHONE_LENGTH) {
+    errors.phone = MESSAGES.phoneInvalid;
+  }
+
+  if (errors.password === undefined && !isStrongPassword(form.password)) {
+    errors.password = MESSAGES.passwordInvalid;
+  }
+
+  if (
+    errors.confirmPassword === undefined &&
+    form.confirmPassword !== form.password
+  ) {
+    errors.confirmPassword = MESSAGES.confirmMismatch;
+  }
+
+  return { errors, hasEmpty };
+}
+
+// Hàm tạm:thay bằng lời gọi API kiểm tra email đã tồn tại (1 email / 1 tài khoản)
+function isEmailRegistered(_email: string): Promise<boolean> {
+  return Promise.resolve(false);
+}
+
+// ==================== FORM FIELD ====================
+
+interface FormFieldProps {
+  id: string;
+  label: string;
+  icon: string;
+  type?: "text" | "tel" | "email" | "password";
+  inputMode?: "text" | "numeric" | "email";
+  maxLength?: number;
+  placeholder: string;
+  value: string;
+  autoComplete?: string;
+  error?: string;
+  onChange: (value: string) => void;
+}
+
+function FormField({
+  id,
+  label,
+  icon,
+  type = "text",
+  inputMode,
+  maxLength,
+  placeholder,
+  value,
+  autoComplete,
+  error,
+  onChange,
+}: Readonly<FormFieldProps>) {
+  // Hiện / ẩn mật khẩu (chỉ dùng khi type = "password")
+  const [visible, setVisible] = useState(false);
+  const isPassword = type === "password";
+  const invalid = error !== undefined;
+
+  return (
+    <div className="register-card__field">
+      <label className="register-card__label" htmlFor={id}>
+        {label}{" "}
+        <span className="register-card__required" aria-hidden="true">
+          *
+        </span>
+      </label>
+
+      <div
+        className={`register-card__input-box${
+          invalid ? " register-card__input-box--error" : ""
+        }`}
+      >
+        <i
+          className={`fa-solid ${icon} register-card__icon`}
+          aria-hidden="true"
+        ></i>
+
+        <input
+          id={id}
+          className="register-card__input"
+          type={isPassword && visible ? "text" : type}
+          inputMode={inputMode}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          value={value}
+          autoComplete={autoComplete}
+          aria-invalid={invalid}
+          aria-describedby={error ? `${id}-error` : undefined}
+          onChange={(e) => onChange(e.target.value)}
+        />
+
+        {isPassword && (
+          <button
+            type="button"
+            className="register-card__eye-button"
+            onClick={() => setVisible((prev) => !prev)}
+            aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+            aria-pressed={visible}
+          >
+            <i
+              className={`fa-solid ${
+                visible ? "fa-eye-slash" : "fa-eye"
+              } register-card__eye-icon`}
+              aria-hidden="true"
+            ></i>
+          </button>
+        )}
+      </div>
+
+      {error && (
+        <p id={`${id}-error`} className="register-card__error" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ==================== REGISTER FORM ====================
+
+export default function RegisterForm() {
   const navigate = useNavigate();
 
-  // ==================== FORM STATE ====================
-
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [form, setForm] = useState<FormValues>(INITIAL_FORM);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [formError, setFormError] = useState("");
   const [term, setTerm] = useState(false);
+  const [termError, setTermError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  // Hiện / ẩn mật khẩu
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // Gõ vào ô nào thì xóa lỗi của ô đó
+  const updateField = (key: FieldKey) => (value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
 
-  // ==================== REGISTER ====================
+    setErrors((prev) => {
+      if (!(key in prev)) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
 
-  //
+    setFormError("");
+  };
 
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submitting) return;
 
-    // Kiểm tra dữ liệu bắt buộc
-    if (!fullName || !phone || !email || !password || !confirmPassword) {
-      alert("Vui lòng nhập đầy đủ thông tin.");
-      return;
+    const { errors: found, hasEmpty } = validate(form);
+
+    setErrors(found);
+    setFormError(hasEmpty ? MESSAGES.empty : "");
+
+    setTermError(term ? "" : MESSAGES.termRequired);
+
+    if (Object.keys(found).length > 0 || !term) return;
+
+    setSubmitting(true);
+
+    try {
+      if (await isEmailRegistered(form.email.trim())) {
+        setErrors({ email: MESSAGES.emailExists });
+        return;
+      }
+
+      // Truyền email / SĐT sang trang OTP để hiển thị
+      void navigate(ROUTES.REGISTER_OTP, {
+        state: { email: form.email.trim(), phone: form.phone },
+      });
+    } finally {
+      setSubmitting(false);
     }
-
-    // Kiểm tra mật khẩu
-    if (password.length < 6) {
-      alert("Mật khẩu phải có ít nhất 6 ký tự.");
-      return;
-    }
-
-    // Kiểm tra xác nhận mật khẩu
-    if (password !== confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp.");
-      return;
-    }
-
-    // Kiểm tra điều khoản
-    if (!term) {
-      alert("Vui lòng đồng ý với điều khoản và chính sách.");
-      return;
-    }
-
-    void navigate(ROUTES.REGISTER_OTP);
   };
 
   return (
@@ -66,269 +258,187 @@ export default function AuthLayout() {
           {/* ==================== CARD HEADER ==================== */}
 
           <div className="register-card__header">
-            <div className="register-card__title">
-              <h1 className="register-card__text">Tạo tài khoản mới</h1>
+            <h1 className="register-card__title">
+              <span>Tạo tài khoản mới</span>
+              <span className="register-card__dot" aria-hidden="true"></span>
+            </h1>
 
-              <div className="register-card__circle-container">
-                <div className="register-card__circle"></div>
-              </div>
-            </div>
-
-            <div className="register-card__discount">
-              <p className="register-card__discount-text">
-                Nhận ngay{" "}
-                <span className="register-card__discount-text--highlight">
-                  Voucher 500.000đ
-                </span>{" "}
-                và đặc quyền khách hàng công nghệ cao cấp.
-              </p>
-            </div>
+            <p className="register-card__discount">
+              Nhận ngay{" "}
+              <span className="register-card__discount-highlight">
+                Voucher 500.000đ
+              </span>{" "}
+              và đặc quyền khách hàng công nghệ cao cấp.
+            </p>
           </div>
 
           {/* ==================== REGISTER FORM ==================== */}
 
-          <form className="register-card__form" onSubmit={handleRegister}>
-            {/* HỌ VÀ TÊN + SỐ ĐIỆN THOẠI */}
+          <form
+            className="register-card__form"
+            onSubmit={(e) => void handleRegister(e)}
+            noValidate
+          >
+            <div className="register-card__row">
+              <FormField
+                id="fullName"
+                label="HỌ VÀ TÊN"
+                icon="fa-user"
+                placeholder="Nguyễn Văn A"
+                autoComplete="name"
+                value={form.fullName}
+                error={errors.fullName}
+                onChange={updateField("fullName")}
+              />
 
-            <div className="register-card__row--two-columns">
-              {/* Họ và tên */}
-
-              <div className="register-card__full-name">
-                <label
-                  className="register-card__full-name-label"
-                  htmlFor="fullName"
-                >
-                  HỌ VÀ TÊN <span className="register-card__request">*</span>
-                </label>
-
-                <div className="register-card__input-box">
-                  <i className="fa-solid fa-user register-card__icon"></i>
-
-                  <input
-                    id="fullName"
-                    className="register-card__input"
-                    type="text"
-                    placeholder="Nguyễn Văn A"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Số điện thoại */}
-
-              <div className="register-card__tel">
-                <label className="register-card__tel-label" htmlFor="tel">
-                  SỐ ĐIỆN THOẠI{" "}
-                  <span className="register-card__request">*</span>
-                </label>
-
-                <div className="register-card__input-box">
-                  <i className="fa-solid fa-phone register-card__icon"></i>
-
-                  <input
-                    id="tel"
-                    className="register-card__input"
-                    type="tel"
-                    placeholder="0912 345 678"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-              </div>
+              <FormField
+                id="tel"
+                label="SỐ ĐIỆN THOẠI"
+                icon="fa-phone"
+                type="tel"
+                inputMode="numeric"
+                maxLength={PHONE_LENGTH}
+                placeholder="0912345678"
+                autoComplete="tel"
+                value={form.phone}
+                error={errors.phone}
+                // Chỉ cho nhập số
+                onChange={(value) =>
+                  updateField("phone")(value.replace(/\D/g, ""))
+                }
+              />
             </div>
 
-            {/* GMAIL */}
+            <FormField
+              id="email"
+              label="EMAIL"
+              icon="fa-envelope"
+              inputMode="email"
+              placeholder="tenban@gmail.com"
+              autoComplete="email"
+              value={form.email}
+              error={errors.email}
+              onChange={updateField("email")}
+            />
 
-            <div className="register-card__row--one-column">
-              <div className="register-card__email">
-                <label className="register-card__email-label" htmlFor="email">
-                  GMAIL <span className="register-card__request">*</span>
-                </label>
+            <div className="register-card__row">
+              <FormField
+                id="password"
+                label="MẬT KHẨU"
+                icon="fa-lock"
+                type="password"
+                placeholder={`≥ ${MIN_PASSWORD_LENGTH} ký tự`}
+                autoComplete="new-password"
+                value={form.password}
+                error={errors.password}
+                onChange={updateField("password")}
+              />
 
-                <div className="register-card__input-box">
-                  <i className="fa-solid fa-envelope register-card__icon"></i>
-
-                  <input
-                    id="email"
-                    className="register-card__input"
-                    type="email"
-                    placeholder="tenban@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
+              <FormField
+                id="confirmPassword"
+                label="NHẬP LẠI MẬT KHẨU"
+                icon="fa-shield"
+                type="password"
+                placeholder="Nhập lại mật khẩu"
+                autoComplete="new-password"
+                value={form.confirmPassword}
+                error={errors.confirmPassword}
+                onChange={updateField("confirmPassword")}
+              />
             </div>
 
-            {/* MẬT KHẨU + XÁC NHẬN MẬT KHẨU */}
-
-            <div className="register-card__row--two-columns">
-              {/* Mật khẩu */}
-
-              <div className="register-card__password">
-                <label
-                  className="register-card__password-label"
-                  htmlFor="password"
-                >
-                  MẬT KHẨU <span className="register-card__request">*</span>
-                </label>
-
-                <div className="register-card__input-box">
-                  <i className="fa-solid fa-lock register-card__icon"></i>
-
-                  <input
-                    id="password"
-                    className="register-card__input"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="≥ 8 ký tự"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="new-password"
-                  />
-
-                  <button
-                    type="button"
-                    className="register-card__eye-button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-                  >
-                    <i
-                      className={`fa-solid ${
-                        showPassword ? "fa-eye-slash" : "fa-eye"
-                      } register-card__eye-icon`}
-                    ></i>
-                  </button>
-                </div>
-              </div>
-
-              {/* Xác nhận mật khẩu */}
-
-              <div className="register-card__auth-password">
-                <label
-                  className="register-card__auth-password-label"
-                  htmlFor="authPassword"
-                >
-                  XÁC THỰC MẬT KHẨU{" "}
-                  <span className="register-card__request">*</span>
-                </label>
-
-                <div className="register-card__input-box">
-                  <i className="fa-solid fa-shield register-card__icon"></i>
-
-                  <input
-                    id="authPassword"
-                    className="register-card__input"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Nhập lại mật khẩu"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    autoComplete="new-password"
-                  />
-
-                  <button
-                    type="button"
-                    className="register-card__eye-button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={
-                      showConfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
-                    }
-                  >
-                    <i
-                      className={`fa-solid ${
-                        showConfirmPassword ? "fa-eye-slash" : "fa-eye"
-                      } register-card__eye-icon`}
-                    ></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            {formError && (
+              <p className="register-card__form-error" role="alert">
+                {formError}
+              </p>
+            )}
 
             {/* ==================== TERM ==================== */}
 
-            <div className="register-card__term">
-              <input
-                type="checkbox"
-                id="term"
-                checked={term}
-                onChange={(e) => setTerm(e.target.checked)}
-              />
+            <div className="register-card__term-group">
+              <div className="register-card__term">
+                <input
+                  id="term"
+                  className="register-card__term-checkbox"
+                  type="checkbox"
+                  checked={term}
+                  aria-describedby={termError ? "term-error" : undefined}
+                  onChange={(e) => {
+                    setTerm(e.target.checked);
+                    setTermError("");
+                  }}
+                />
 
-              <label className="register-card__term-label" htmlFor="term">
-                Đồng ý với{" "}
-                <span className="register-card__term-label--highlight">
-                  Điều khoản Nexora
-                </span>{" "}
-                và{" "}
-                <span className="register-card__term-label--highlight">
-                  Chính sách bảo vệ dữ liệu
-                </span>
-              </label>
+                <label className="register-card__term-label" htmlFor="term">
+                  Đồng ý với{" "}
+                  <span className="register-card__term-link">
+                    Điều khoản Nexora
+                  </span>{" "}
+                  và{" "}
+                  <span className="register-card__term-link">
+                    Chính sách bảo vệ dữ liệu
+                  </span>
+                </label>
+              </div>
+
+              {termError && (
+                <p
+                  id="term-error"
+                  className="register-card__error"
+                  role="alert"
+                >
+                  {termError}
+                </p>
+              )}
             </div>
 
             {/* ==================== SUBMIT ==================== */}
 
-            <button className="register-card__submit" type="submit">
-              <span className="register-card__submit-text">
-                Tạo tài khoản Nexora
-              </span>
+            <button
+              className="register-card__submit"
+              type="submit"
+              disabled={submitting}
+            >
+              <span>Tạo tài khoản Nexora</span>
 
-              <i className="fa-solid fa-arrow-right-long register-card__submit-icon"></i>
+              <i
+                className="fa-solid fa-arrow-right-long register-card__submit-icon"
+                aria-hidden="true"
+              ></i>
             </button>
           </form>
 
           {/* ==================== FAST REGISTER ==================== */}
 
-          <div className="register-card--fast-register-label">
-            <div className="register-card__line"></div>
-
-            <span className="register-card--fast-register-text">
+          <div className="register-card__divider">
+            <span className="register-card__divider-text">
               HOẶC ĐĂNG KÝ NHANH
             </span>
           </div>
 
-          <div className="register-card--fast-register">
-            {/* Google */}
-
-            <button
-              type="button"
-              className="register-card--fast-register-google"
-            >
-              <img
-                className="register-card--fast-register-icon"
-                src={google}
-                alt="Google"
-              />
-
-              <span className="register-card--fast-register-desc">Google</span>
-            </button>
-
-            {/* Outlook */}
-
-            <button
-              type="button"
-              className="register-card--fast-register-outlook"
-            >
-              <img
-                className="register-card--fast-register-icon"
-                src={outlook}
-                alt="Outlook"
-              />
-
-              <span className="register-card--fast-register-desc">Outlook</span>
-            </button>
+          <div className="register-card__social">
+            {SOCIAL_PROVIDERS.map(({ name, icon }) => (
+              <button
+                key={name}
+                type="button"
+                className="register-card__social-button"
+              >
+                <img className="register-card__social-icon" src={icon} alt="" />
+                <span className="register-card__social-text">{name}</span>
+              </button>
+            ))}
           </div>
 
           {/* ==================== CARD FOOTER ==================== */}
 
-          <div className="register-card-footer">
-            <span className="register-card__haveAccount">
-              Bạn đã có tài khoản
+          <div className="register-card__footer">
+            <span className="register-card__footer-text">
+              Bạn đã có tài khoản?
             </span>
 
-            <a href="#" className="register-card__loginNow">
-              Đăng nhập ngay ›
-            </a>
+            <Link to="/login" className="register-card__footer-link">
+              Đăng nhập ngay
+            </Link>
           </div>
         </div>
       </main>

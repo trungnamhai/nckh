@@ -1,83 +1,127 @@
+:root {
+  --color-header-bg: #0206174d;
+
+  --font-heading: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Be Vietnam Pro", sans-serif;
+
+  --radius-sm: 4px;
+  --blur-glass: 12px;
+  --transition-fast: 0.2s ease;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
 .auth-header {
   width: 100%;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding: 20px 48px;
 
-  background: #0206174d;
+  background: var(--color-header-bg);
   border-bottom: 1px solid var(--color-white-10);
-  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  backdrop-filter: blur(var(--blur-glass));
 }
 
+/* Logo + tên thương hiệu */
 .auth-header__link {
   display: flex;
   align-items: center;
-  text-decoration: none;
-
   gap: 10px;
+  text-decoration: none;
 }
 
 .auth-header__logo {
+  display: block;
   width: 32px;
   height: 32px;
   flex-shrink: 0;
 }
 
 .auth-header__text {
-  font-family: "Plus Jakarta Sans";
+  font-family: var(--font-heading);
   font-weight: 800;
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.9px;
-
   color: var(--color-white);
 }
 
+/* ==========================================================================
+   Khám phá ngay
+   ========================================================================== */
 .auth-header__explore {
-  height: 30px;
-
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 
   background: var(--color-white-10);
-  color: var(--color-white-90);
   border: 1px solid var(--color-white-20);
+  color: var(--color-white-90);
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  backdrop-filter: blur(var(--blur-glass));
 
-  backdrop-filter: blur(12px);
-}
-
-.auth-header__explore-text {
-  font-family: "Be Vietnam Pro", sans-serif;
+  font-family: var(--font-body);
   font-weight: 500;
   font-size: 12px;
   line-height: 16px;
-  letter-spacing: 0px;
-  color: var(--color-white-90);
-  font-style: normal;
+  text-decoration: none;
+  cursor: pointer;
+
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.auth-header__explore-text {
+  color: inherit;
+  font: inherit;
   text-decoration: none;
 }
 
 .auth-header__explore-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transform: translateY(1px);
-}
-
-.auth-header__explore-icon-image {
   font-size: 8.7px;
   line-height: 1;
-
-  color: var(--color-white-90);
-  opacity: 1;
+  transition: transform var(--transition-fast);
 }
+
+@media (hover: hover) {
+  .auth-header__explore:hover {
+    background: var(--color-white-20);
+    border-color: var(--color-white-90);
+    color: var(--color-white);
+  }
+
+  .auth-header__explore:hover .auth-header__explore-icon {
+    transform: translateX(3px);
+  }
+}
+
+.auth-header__explore:active {
+  transform: scale(0.97);
+}
+
+.auth-header__explore:focus-visible {
+  outline: 2px solid var(--color-white-90);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-header__explore,
+  .auth-header__explore-icon {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
 
 /* Tablet */
 @media (max-width: 1024px) {
@@ -89,7 +133,6 @@
 /* Mobile */
 @media (max-width: 768px) {
   .auth-header {
-    height: 64px;
     padding: 16px 20px;
   }
 
@@ -99,9 +142,7 @@
 
   .auth-header__explore {
     padding: 8px 14px;
-  }
-
-  .auth-header__explore-text {
     font-size: 14px;
+    line-height: 20px;
   }
 }

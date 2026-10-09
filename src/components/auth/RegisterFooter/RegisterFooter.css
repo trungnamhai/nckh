@@ -1,15 +1,33 @@
+/* ==========================================================================
+   Footer trang đăng ký
+   ========================================================================== */
 .register-footer {
+  /* Màu */
+  --footer-bg: #02061766;
+  --footer-border: #ffffff1a;
+  --footer-text: #ffffffb2;
+  --footer-text-strong: #ffffff;
+  --footer-separator: #ffffff4d;
+  --footer-line: #ffffffcc;
+  --footer-active-bg: #ee4d2d;
+  --footer-active-shadow: 0px 1px 2px 0px #0000000d;
+
+  /* Khác */
+  --footer-radius: 4px;
+  --footer-gap: 16px;
+  --footer-transition: 0.2s ease;
+
   width: 100%;
-  display: flex;
-  align-items: center;
-
   padding: 16px 72px;
-
-  background: #02061766;
-  border-top: 1px solid #ffffff1a;
-
-  backdrop-filter: blur(12px);
   box-sizing: border-box;
+
+  background: var(--footer-bg);
+  border-top: 1px solid var(--footer-border);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+
+  font-size: 12px;
+  line-height: 16px;
 }
 
 .register-footer__container {
@@ -18,213 +36,184 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-/* =========================
-   Nội dung bên trái
-========================= */
+/* ==================== Nội dung bên trái ==================== */
 
 .register-footer__content {
   display: flex;
   align-items: center;
-
-  line-height: 16px;
+  flex-wrap: wrap;
+  gap: var(--footer-gap);
 }
 
 .register-footer__copyright {
-  font-family: "Be Vietnam Pro", sans-serif;
   font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: #ffffffb2;
+  color: var(--footer-text);
 }
 
-/* =========================
-   Các liên kết
-========================= */
+/* Dấu • giữa copyright và nhóm link */
+.register-footer__copyright::after {
+  content: "•";
+  margin-left: var(--footer-gap);
+  color: var(--footer-separator);
+}
 
-.register-footer__link {
+/* ==================== Các liên kết ==================== */
+
+.register-footer__links {
   display: flex;
   align-items: center;
-
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: var(--footer-gap);
 
   margin: 0;
   padding: 0;
-
   list-style: none;
 }
 
-.register-footer__link li {
+.register-footer__links li {
   display: flex;
   align-items: center;
+  gap: var(--footer-gap);
 }
 
-.register-footer__link a {
-  font-family: "Be Vietnam Pro", sans-serif;
+/* Dấu • chỉ nằm GIỮA các link, link đầu không có */
+.register-footer__links li + li::before {
+  content: "•";
   font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0;
+  color: var(--footer-separator);
+}
 
-  color: #ffffffb2;
+.register-footer__link {
+  font-weight: 400;
+  color: var(--footer-text);
   text-decoration: none;
+
+  transition: color var(--footer-transition);
 }
 
-.register-footer__link a:hover {
-  color: #ffffff;
-}
+/* ==================== Số trang bên phải ==================== */
 
-/* Dấu phân cách */
-
-.register-footer__separator {
-  font-family: "Be Vietnam Pro", sans-serif;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: #ffffff4d;
-}
-
-/* =========================
-   Số trang bên phải
-========================= */
-
-.register-footer__page-number {
+.register-footer__pages {
   display: flex;
   align-items: center;
-
   gap: 8px;
 }
 
-/* =========================
-   Button chung
-========================= */
+.register-footer__page {
+  height: 20px;
+  padding: 2px 8px;
+  box-sizing: border-box;
 
-.register-footer__page-button {
   border: none;
-  margin: 0;
+  border-radius: var(--footer-radius);
 
+  background: transparent;
+  color: var(--footer-text);
+
+  font-family: inherit;
+  font-weight: 600;
   font-size: 12px;
   line-height: 16px;
-  letter-spacing: 0;
-
-  text-align: center;
-  vertical-align: middle;
-
   cursor: pointer;
-  box-sizing: border-box;
-  border-radius: 4px;
+
+  transition: color var(--footer-transition);
 }
 
-.register-footer__page-button--01 {
-  padding: 2px 8px;
-
-  font-weight: 600;
-  color: #ffffffb2;
-  background-color: transparent;
-}
-
-.register-footer__page-button--01:hover {
-  color: #ffffff;
-}
-
-.register-footer__page-button--02 {
-  padding: 2px 8px;
-
-  background: #ee4d2d;
-
-  box-shadow: 0px 1px 2px 0px #0000000d;
-
-  color: #ffffff;
-
+/* Trang đang active */
+.register-footer__page--active {
+  background: var(--footer-active-bg);
+  box-shadow: var(--footer-active-shadow);
+  color: var(--footer-text-strong);
   font-weight: 700;
 }
 
-.register-footer__page-button--02:hover {
-  color: #ffffff;
-}
-
-/* =========================
-   Đường gạch
-========================= */
-
+/* Đường gạch */
 .register-footer__page-line {
   width: 32px;
   height: 2px;
 
   border-radius: 9999px;
-
-  background: #ffffffcc;
+  background: var(--footer-line);
 }
 
-.register-footer__page-button--03 {
-  width: 28.41px;
-  height: 20px;
-
-  padding: 2px 6px;
+/* Nút ngay sau đường gạch cách thêm 4px */
+.register-footer__page-line + .register-footer__page {
   margin-left: 4px;
-
-  border-radius: 4px;
-
-  background: transparent;
-
-  color: #ffffffb2;
-
-  font-weight: 600;
 }
 
-.register-footer__page-button--03:hover {
-  color: #ffffff;
+/* ==================== Hover / Focus ==================== */
+
+/* Hover: chỉ áp dụng cho thiết bị có chuột */
+@media (hover: hover) {
+  .register-footer__link:hover,
+  .register-footer__page:not(.register-footer__page--active):hover {
+    color: var(--footer-text-strong);
+  }
 }
 
-/* =========================
-   Responsive 1024px
-========================= */
+.register-footer__link:focus-visible,
+.register-footer__page:focus-visible {
+  color: var(--footer-text-strong);
+  outline: 2px solid var(--footer-text-strong);
+  outline-offset: 2px;
+  border-radius: var(--footer-radius);
+}
 
+@media (prefers-reduced-motion: reduce) {
+  .register-footer__link,
+  .register-footer__page {
+    transition: none;
+  }
+}
+
+/* ==================== Responsive ==================== */
+
+/* Tablet */
 @media (max-width: 1024px) {
   .register-footer {
-    padding: 16px 32px;
-  }
+    --footer-gap: 12px;
 
-  .register-footer__link {
-    gap: 12px;
+    padding: 16px 32px;
   }
 }
 
-/* =========================
-   Responsive 768px
-========================= */
-
-@media (max-width: 768px) {
-  .register-footer {
-    height: auto;
-    min-height: 53px;
-
-    padding: 12px 20px;
-  }
-
+/* Không đủ chỗ cho 1 hàng: xếp dọc, bỏ dấu • */
+@media (max-width: 900px) {
   .register-footer__container {
+    flex-direction: column;
+    justify-content: center;
     gap: 12px;
-    flex-wrap: wrap;
   }
 
   .register-footer__content {
-    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
     gap: 8px;
+    text-align: center;
   }
 
-  .register-footer__copyright {
-    margin-right: 8px;
+  .register-footer__copyright::after,
+  .register-footer__links li + li::before {
+    display: none;
   }
 
-  .register-footer__link {
-    gap: 8px;
+  .register-footer__links {
+    justify-content: center;
+    gap: 6px 16px;
   }
+}
 
-  .register-footer__page-number {
-    gap: 8px;
+/* Mobile */
+@media (max-width: 768px) {
+  .register-footer {
+    --footer-gap: 8px;
+
+    min-height: 53px;
+    padding: 12px 20px;
   }
 
   .register-footer__page-line {

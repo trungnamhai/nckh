@@ -1,3 +1,31 @@
+:root {
+  /* Font + khác */
+  --font-body: "Be Vietnam Pro", sans-serif;
+  --radius-sm: 4px;
+  --transition-fast: 0.2s ease;
+
+  /* Màu */
+  --color-surface: #ffffff;
+  --color-card-border: #ffffff66;
+  --color-input-bg: #f8f9fa;
+  --color-label: #4d5563;
+  --color-primary-20: #ed482620;
+
+  --color-gray-900: #111827;
+  --color-gray-700: #374151;
+  --color-gray-500: #6b7280;
+  --color-gray-400: #9ca3af;
+  --color-gray-200: #e5e7eb;
+
+  /* Đổ bóng */
+  --shadow-card: 0px 25px 50px -12px #00000040;
+  --shadow-button: 0px 4px 6px -1px #0000001a;
+
+  --color-error: #dc2626;
+}
+
+/* ==================== LAYOUT ==================== */
+
 .auth-layout {
   flex: 1;
   width: 100%;
@@ -6,12 +34,11 @@
   align-items: center;
 
   padding: 8px 16px;
-
   box-sizing: border-box;
 }
 
 .register-main {
-  width: 500px;
+  width: 100%;
   max-width: 500px;
   margin: 0 auto;
 }
@@ -19,75 +46,58 @@
 /* ==================== CARD ==================== */
 
 .register-card {
-  width: 500px;
-  max-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
+  gap: 16px;
 
-  gap: 13.5px;
-
-  border-radius: 16px;
   padding: 28px;
-
-  font-family: "Be Vietnam Pro", sans-serif;
-
-  background: #ffffff;
-
-  box-shadow: 0px 25px 50px -12px #00000040;
-
-  border: 1px solid #ffffff66;
+  border-radius: 16px;
+  border: 1px solid var(--color-card-border);
 
   backdrop-filter: blur(4px);
+
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+
+  font-family: var(--font-body);
 }
 
 /* ==================== CARD HEADER ==================== */
 
 .register-card__header {
-  width: 100%;
-
   display: flex;
   flex-direction: column;
-
   gap: 4px;
 }
 
 .register-card__title {
-  display: flex;
-
-  gap: 6px;
-
-  align-items: center;
-}
-
-.register-card__text {
   margin: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
   letter-spacing: -0.6px;
 
-  color: #111827;
+  color: var(--color-gray-900);
 }
 
-.register-card__circle-container {
-  width: 8px;
-  height: 10px;
-
-  padding-bottom: 2px;
-}
-
-.register-card__circle {
+.register-card__dot {
   width: 8px;
   height: 8px;
+  margin-bottom: 2px;
 
   border-radius: 9999px;
-
   background: var(--color-primary);
 }
 
-.register-card__discount-text {
+.register-card__discount {
   margin: 0;
 
   font-weight: 400;
@@ -97,483 +107,121 @@
   color: var(--color-text);
 }
 
-.register-card__discount-text--highlight {
-  color: var(--color-primary);
-
+.register-card__discount-highlight {
   font-weight: 600;
-  font-size: 12px;
-  line-height: 19.5px;
+  color: var(--color-primary);
 }
 
 /* ==================== FORM ==================== */
 
 .register-card__form {
-  padding-top: 2.5px;
-
   display: flex;
   flex-direction: column;
-
   gap: 12px;
-
-  font-family: "Be Vietnam Pro", sans-serif;
 }
 
-.register-card__row--two-columns {
-  display: flex;
-
+.register-card__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 12px;
-
-  width: 100%;
 }
 
-.register-card__row--one-column {
-  width: 100%;
-}
-
-.register-card__full-name,
-.register-card__tel,
-.register-card__email,
-.register-card__password,
-.register-card__auth-password {
-  width: 100%;
-
+.register-card__field {
   display: flex;
   flex-direction: column;
-
   gap: 4px;
 }
 
 /* ==================== LABEL ==================== */
 
-.register-card__full-name-label,
-.register-card__tel-label,
-.register-card__email-label,
-.register-card__password-label,
-.register-card__auth-password-label {
-  display: flex;
-
-  flex-direction: row;
-
+.register-card__label {
   font-weight: 600;
   font-size: 11px;
   line-height: 16.5px;
   letter-spacing: 0.55px;
-
   text-transform: uppercase;
 
-  color: #4d5563;
+  color: var(--color-label);
 }
 
-.register-card__request {
+.register-card__required {
   color: var(--color-primary);
 }
 
 /* ==================== INPUT BOX ==================== */
 
 .register-card__input-box {
-  display: flex;
+  height: 40px;
+  box-sizing: border-box;
 
+  display: flex;
   align-items: center;
 
-  height: 40px;
-
+  padding: 0 12px;
   border-radius: 6px;
-
-  background: #f8f9fa;
-
-  border: 1px solid #e5e7eb;
-
+  border: 1px solid var(--color-gray-200);
   overflow: hidden;
 
-  padding: 0 12px;
-
+  background: var(--color-input-bg);
   color: var(--color-text);
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .register-card__input-box:focus-within {
   border-color: var(--color-primary);
-
-  box-shadow: 0 0 0 2px #ed482620;
+  box-shadow: 0 0 0 2px var(--color-primary-20);
 }
 
-/* ==================== INPUT ICON ==================== */
+/* Trạng thái lỗi */
+.register-card__input-box--error,
+.register-card__input-box--error:focus-within {
+  border-color: var(--color-error);
+  box-shadow: none;
+}
+
+.register-card__error,
+.register-card__form-error {
+  margin: 0;
+
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: var(--color-error);
+}
 
 .register-card__icon {
   width: 11.2px;
-
-  font-size: 11.2px;
-
   flex-shrink: 0;
 
-  color: #9ca3af;
+  font-size: 11.2px;
+  color: var(--color-gray-400);
 }
 
-/* ==================== INPUT ==================== */
-
 .register-card__input {
+  flex: 1;
+  min-width: 0;
   height: 100%;
 
-  padding: 10px 12px;
-
-  width: 100%;
-
-  background: #f8f9fa;
-
-  outline: none;
+  padding: 0 12px;
 
   border: none;
+  outline: none;
+  background: transparent;
 
-  color: var(--color-text);
-
-  font-family: "Be Vietnam Pro", sans-serif;
+  color: inherit;
+  font-family: inherit;
+  font-size: 14px;
 }
 
 .register-card__input::placeholder {
   font-weight: 400;
-
-  font-size: 14px;
-
-  line-height: 100%;
-
-  color: #9ca3af;
-}
-
-/* ==================== PASSWORD EYE ==================== */
-
-.register-card__eye-button {
-  width: 20px;
-  height: 20px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: none;
-  outline: none;
-
-  background: transparent;
-
-  cursor: pointer;
-
-  flex-shrink: 0;
-}
-
-.register-card__eye-icon {
-  font-size: 13px;
-
-  color: #9ca3af;
-}
-
-/* ==================== TERM ==================== */
-
-.register-card__term {
-  position: relative;
-
-  height: 18px;
-}
-
-#term {
-  width: 18px;
-  height: 18px;
-
-  border-radius: 4px;
-
-  margin: 0;
-
-  position: absolute;
-
-  top: 1px;
-  left: -1px;
-
-  border: 1px solid #000000;
-
-  accent-color: var(--color-primary);
-
-  cursor: pointer;
-}
-
-.register-card__term-label {
-  padding-left: 8px;
-
-  position: absolute;
-
-  top: 2.5px;
-  left: 16px;
-
-  font-weight: 400;
-  font-size: 12px;
-
-  color: #374151;
-
-  cursor: pointer;
-}
-
-.register-card__term-label--highlight {
-  font-weight: 500;
-
-  font-size: 12px;
-
-  color: var(--color-primary);
-}
-
-/* ==================== SUBMIT BUTTON ==================== */
-
-.register-card__submit {
-  height: 42px;
-
-  position: relative;
-
-  border-radius: 4px;
-
-  padding: 0 16px;
-
-  background-color: var(--color-primary);
-
-  box-shadow: 0px 4px 6px -1px #0000001a;
-
-  border: none;
-
-  outline: none;
-
-  cursor: pointer;
-
-  font-family: "Be Vietnam Pro", sans-serif;
-}
-
-.register-card__submit:hover {
-  opacity: 0.95;
-}
-
-.register-card__submit-text {
-  height: 20px;
-
-  display: inline-block;
-
-  font-weight: 500;
-
-  font-size: 14px;
-
-  line-height: 20px;
-
-  color: var(--color-white);
-
-  margin-right: 8px;
-}
-
-.register-card__submit-icon {
-  position: absolute;
-
-  font-size: 8.3px;
-
-  color: var(--color-white);
-
-  top: 16px;
-}
-
-/* ==================== FAST REGISTER LABEL ==================== */
-
-.register-card--fast-register-label {
-  position: relative;
-
-  width: 100%;
-  height: 24px;
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-  padding-top: 7px;
-  padding-bottom: 3px;
-}
-
-.register-card__line::after {
-  position: absolute;
-
-  content: "";
-
-  display: block;
-
-  width: 100%;
-  height: 1px;
-
-  background: #e5e7eb;
-
-  top: 11.5px;
-  left: 0;
-
-  z-index: 0;
-}
-
-.register-card--fast-register-text {
-  position: absolute;
-
-  top: 5px;
-
-  z-index: 1;
-
-  height: 17px;
-
-  background: var(--color-white);
-
-  color: #9ca3af;
-
-  padding: 0 12px;
-
-  font-weight: 700;
-
-  font-size: 11px;
-
-  text-transform: uppercase;
-}
-
-/* ==================== FAST REGISTER ==================== */
-
-.register-card--fast-register {
-  display: flex;
-
-  gap: 12px;
-}
-
-.register-card--fast-register-google,
-.register-card--fast-register-outlook {
-  height: 38px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 8px;
-
-  border-radius: 4px;
-
-  padding: 0 73px;
-
-  background: var(--color-white);
-
-  border: 1px solid #e5e7eb;
-
-  cursor: pointer;
-
-  font-family: "Be Vietnam Pro", sans-serif;
-}
-
-.register-card--fast-register-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.register-card--fast-register-desc {
-  height: 16px;
-
-  font-weight: 500;
-
-  font-size: 12px;
-
-  color: #374151;
-}
-
-/* ==================== CARD FOOTER ==================== */
-
-.register-card-footer {
-  display: flex;
-
-  justify-content: center;
-
-  gap: 4px;
-
-  height: 16px;
-}
-
-.register-card__haveAccount {
-  font-weight: 400;
-
-  font-size: 12px;
-
-  color: #6b7280;
-}
-
-.register-card__loginNow {
-  font-weight: 700;
-
-  font-size: 12px;
-
-  color: var(--color-primary);
-
-  text-decoration: none;
-}
-
-/* ==================== RESPONSIVE ==================== */
-
-@media (max-width: 1024px) {
-  .auth-layout {
-    flex: 1;
-    width: 100%;
-    min-height: 0;
-    padding: 8px 16px;
-  }
-
-  .register-main {
-    width: 100%;
-    max-width: 500px;
-    min-height: auto;
-    padding: 80px 0;
-  }
-
-  .register-card {
-    width: 100%;
-  }
-
-  .register-card--fast-register-google,
-  .register-card--fast-register-outlook {
-    padding: 0 20px;
-    flex: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .register-main {
-    width: 100%;
-
-    max-width: 350px;
-
-    margin: 0 auto;
-
-    padding: 40px 0;
-  }
-
-  .register-card {
-    width: 350px;
-
-    max-width: 100%;
-
-    padding: 20px;
-  }
-
-  .register-card__row--two-columns {
-    flex-direction: column;
-  }
-
-  .register-card__submit {
-    margin-top: 12px;
-  }
-
-  .register-card--fast-register {
-    gap: 8px;
-  }
-
-  .register-card--fast-register-google,
-  .register-card--fast-register-outlook {
-    padding: 0 12px;
-
-    flex: 1;
-  }
+  color: var(--color-gray-400);
+  opacity: 1;
 }
 
 .register-card__input::-ms-reveal,
@@ -587,4 +235,281 @@
 
 .register-card__input::-webkit-textfield-decoration-container {
   display: none;
+}
+
+/* ==================== PASSWORD EYE ==================== */
+
+.register-card__eye-button {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.register-card__eye-icon {
+  font-size: 13px;
+  color: var(--color-gray-400);
+
+  transition: color var(--transition-fast);
+}
+
+/* ==================== TERM ==================== */
+
+.register-card__term-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.register-card__term {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.register-card__term-checkbox {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.register-card__term-label {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+
+  color: var(--color-gray-700);
+  cursor: pointer;
+}
+
+.register-card__term-link {
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+/* ==================== SUBMIT BUTTON ==================== */
+
+.register-card__submit {
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-button);
+  color: var(--color-white);
+
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.register-card__submit-icon {
+  font-size: 8.3px;
+
+  transition: transform var(--transition-fast);
+}
+
+.register-card__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==================== FAST REGISTER ==================== */
+
+.register-card__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.register-card__divider::before,
+.register-card__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+
+  background: var(--color-gray-200);
+}
+
+.register-card__divider-text {
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 16px;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: var(--color-gray-400);
+}
+
+.register-card__social {
+  display: flex;
+  gap: 12px;
+}
+
+.register-card__social-button {
+  flex: 1;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-gray-200);
+
+  background: var(--color-white);
+  cursor: pointer;
+
+  font-family: inherit;
+
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.register-card__social-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.register-card__social-text {
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: var(--color-gray-700);
+}
+
+/* ==================== CARD FOOTER ==================== */
+
+.register-card__footer {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.register-card__footer-text {
+  font-weight: 400;
+  color: var(--color-gray-500);
+}
+
+.register-card__footer-link {
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* ==================== HOVER / ACTIVE / FOCUS ==================== */
+
+@media (hover: hover) {
+  .register-card__input-box:hover:not(:focus-within):not(
+      .register-card__input-box--error
+    ) {
+    border-color: var(--color-gray-400);
+  }
+
+  .register-card__eye-button:hover .register-card__eye-icon {
+    color: var(--color-gray-700);
+  }
+
+  .register-card__submit:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  .register-card__submit:hover:not(:disabled) .register-card__submit-icon {
+    transform: translateX(3px);
+  }
+
+  .register-card__social-button:hover {
+    background: var(--color-input-bg);
+    border-color: var(--color-gray-400);
+  }
+
+  .register-card__footer-link:hover,
+  a.register-card__term-link:hover {
+    text-decoration: underline;
+  }
+}
+
+.register-card__submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.register-card__submit:focus-visible,
+.register-card__social-button:focus-visible,
+.register-card__eye-button:focus-visible,
+.register-card__term-checkbox:focus-visible,
+.register-card__footer-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-card__input-box,
+  .register-card__eye-icon,
+  .register-card__submit,
+  .register-card__submit-icon,
+  .register-card__social-button {
+    transition: none;
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1024px) {
+  .register-main {
+    padding: 80px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-main {
+    padding: 40px 0;
+  }
+
+  .register-card {
+    padding: 20px;
+  }
+
+  .register-card__row {
+    grid-template-columns: 1fr;
+  }
+
+  .register-card__submit {
+    margin-top: 12px;
+  }
+
+  .register-card__social {
+    gap: 8px;
+  }
 }

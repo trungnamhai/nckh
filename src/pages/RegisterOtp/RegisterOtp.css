@@ -1,25 +1,44 @@
 /* =========================
    MAIN
 ========================= */
-body {
-  font-family: "Be Vietnam Pro", sans-serif;
-}
 
 .main-container {
+  /* Màu */
+  --color-surface: #ffffff;
+  --color-card-border: #f1f5f9e5;
+  --color-slate-900: #0f172a;
+  --color-slate-600: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-400: #94a3b8;
+  --color-slate-200: #e2e8f0;
+  --color-slate-50: #f8fafc;
+  --color-error: #dc2626;
+
+  /* Đổ bóng */
+  --shadow-card: 0px 10px 20px -5px #0000000a, 0px 20px 45px -10px #00000012;
+  --shadow-primary: 0px 10px 25px -3px #ee4d2d59;
+
+  /* Khác */
+  --radius-sm: 4px;
+  --transition-fast: 0.2s ease;
+
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 32px;
+  box-sizing: border-box;
 
-  background: #f8fafc;
+  display: flex;
+  background: var(--color-slate-50);
 }
 
 .right-auth-section {
-  width: 100%;
-  min-height: 100vh;
+  flex: 1;
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 32px;
-  box-sizing: border-box;
 }
 
 /* =========================
@@ -35,12 +54,9 @@ body {
 .logo-nexora-container {
   width: 100%;
   max-width: 1152px;
-  margin: 0 auto;
 
   display: flex;
-  justify-content: space-between;
   padding: 8px 16px;
-  box-sizing: border-box;
 }
 
 .logo-nexora {
@@ -73,12 +89,12 @@ body {
   flex-direction: column;
   gap: 32px;
 
-  background: #ffffff;
+  background: var(--color-surface);
 
   border-radius: 24px;
-  border: 1px solid #f1f5f9e5;
+  border: 1px solid var(--color-card-border);
 
-  box-shadow: 0px 20px 45px -10px #00000012;
+  box-shadow: var(--shadow-card);
 }
 
 /* =========================
@@ -95,7 +111,6 @@ body {
 
 .heading-2-title {
   width: 100%;
-  height: 32px;
   display: flex;
   justify-content: center;
   gap: 2px;
@@ -107,14 +122,13 @@ body {
   font-size: 24px;
   line-height: 32px;
   letter-spacing: -0.6px;
-  color: #0f172a;
+  color: var(--color-slate-900);
 }
 
 .heading-2-title-dot {
   font-weight: 800;
   font-size: 24px;
   line-height: 32px;
-
   letter-spacing: -0.6px;
   color: var(--color-primary);
 }
@@ -122,6 +136,7 @@ body {
 /* =========================
    DESCRIPTION
 ========================= */
+
 .description-container {
   width: 100%;
   max-width: 320px;
@@ -138,8 +153,7 @@ body {
   font-weight: 400;
   font-size: 14px;
   line-height: 22.75px;
-
-  color: #475569;
+  color: var(--color-slate-600);
 }
 
 /* =========================
@@ -152,7 +166,7 @@ body {
   font-size: 14px;
   line-height: 22.75px;
   letter-spacing: -0.35px;
-  color: #0f172a;
+  color: var(--color-slate-900);
 }
 
 .recipient-phone {
@@ -160,7 +174,7 @@ body {
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
-  color: #94a3b8;
+  color: var(--color-slate-400);
 }
 
 /* =========================
@@ -171,25 +185,22 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-
   gap: 5px;
 
   margin: 0;
 
-  color: #64748b;
-
+  color: var(--color-slate-500);
   font-size: 13px;
   line-height: 20px;
 }
 
 .timer-value {
   color: var(--color-primary);
-
   font-weight: 700;
 }
 
 .timer-warning {
-  color: #dc2626;
+  color: var(--color-error);
 }
 
 /* =========================
@@ -221,13 +232,11 @@ body {
   font-size: 12px;
   line-height: 16px;
   letter-spacing: 0.6px;
-  color: #64748b;
+  color: var(--color-slate-500);
 }
 
 /* =========================
    6 Ô NHẬP OTP
-   (nhắm vào thẻ input nằm trong .otp-input-container
-   nên không phụ thuộc tên class bên trong OtpInput)
 ========================= */
 
 .otp-input-container div:has(> input) {
@@ -248,22 +257,22 @@ body {
   font-family: inherit;
   font-size: 24px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-slate-900);
   caret-color: var(--color-primary);
 
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--color-slate-50);
+  border: 1px solid var(--color-slate-200);
   border-radius: 12px;
   outline: none;
 
   transition:
-    border-color 0.2s,
-    box-shadow 0.2s,
-    background 0.2s;
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .otp-input-container input:focus {
-  background: #ffffff;
+  background: var(--color-surface);
   border-color: var(--color-primary);
   box-shadow:
     0 0 0 1px var(--color-primary),
@@ -275,6 +284,18 @@ body {
   cursor: not-allowed;
 }
 
+/* Trạng thái lỗi: viền đỏ cho cả 6 ô */
+.otp-input-container--error input,
+.otp-input-container--error input:focus {
+  border-color: var(--color-error);
+}
+
+.otp-input-container--error input:focus {
+  box-shadow:
+    0 0 0 1px var(--color-error),
+    0 0 0 4px color-mix(in srgb, var(--color-error) 18%, transparent);
+}
+
 /* =========================
    ERROR
 ========================= */
@@ -284,13 +305,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: 7px;
 
   margin: 0;
 
-  color: #dc2626;
-
+  color: var(--color-error);
   font-size: 13px;
 }
 
@@ -304,7 +323,7 @@ body {
 
 .resend-row {
   width: 100%;
-  height: 24px;
+  min-height: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -315,7 +334,7 @@ body {
   gap: 4px;
   align-items: center;
 
-  color: #64748b;
+  color: var(--color-slate-500);
 }
 
 .resend-text {
@@ -342,21 +361,29 @@ body {
 ========================= */
 
 .btn-resend {
+  margin-left: auto;
+
   display: flex;
   gap: 4px;
   align-items: center;
 
+  padding: 0;
+  border: none;
+  background-color: transparent;
+
+  color: var(--color-primary);
+  font-family: inherit;
   font-weight: 600;
   font-size: 14px;
+  cursor: pointer;
 
-  color: #94a3b8;
-
-  border: none;
-  outline: none;
-  background-color: transparent;
+  transition:
+    color var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
 .btn-resend:disabled {
+  color: var(--color-slate-400);
   cursor: not-allowed;
 }
 
@@ -374,22 +401,31 @@ body {
   height: 48px;
 
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 
-  box-shadow: 0px 10px 25px -3px #ee4d2d59;
-
+  box-shadow: var(--shadow-primary);
   background: var(--color-primary);
-
   color: #ffffff;
 
+  font-family: inherit;
   font-weight: 600;
   font-size: 16px;
-
   cursor: pointer;
 
   transition:
-    filter 0.2s,
-    opacity 0.2s;
+    filter var(--transition-fast),
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.btn-verify:disabled {
+  opacity: 0.6;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-verify:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 /* =========================
@@ -410,12 +446,14 @@ body {
   font-size: 14px;
   line-height: 20px;
 
-  color: #64748b;
+  color: var(--color-slate-500);
+
+  transition: color var(--transition-fast);
 }
 
-.link-back:hover {
-  color: #0f172a;
-}
+/* =========================
+   FOOTER
+========================= */
 
 /* =========================
    FOOTER
@@ -432,32 +470,85 @@ body {
   font-weight: 400;
   font-size: 12px;
   line-height: 19.5px;
-  letter-spacing: 0px;
-  color: #94a3b8;
+  color: var(--color-slate-400);
 }
 
 .right-footer__container {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px 12px;
 }
 
-.right-footer__text {
-  color: #94a3b8;
+/* Dấu • giữa copyright và nhóm link (desktop) */
+.right-footer__text::after {
+  content: "•";
+  margin-left: 12px;
+}
+
+.right-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+}
+
+/* Dấu • giữa các link (desktop) */
+.right-footer__link + .right-footer__link::before {
+  content: "•";
+  margin-right: 12px;
+  color: var(--color-slate-400);
 }
 
 .right-footer__link {
-  color: #94a3b8;
+  color: inherit;
   text-decoration: none;
 }
 
-.right-footer__link:hover {
-  text-decoration: underline;
+/* =========================
+   HOVER / FOCUS
+========================= */
+
+@media (hover: hover) {
+  .otp-input-container:not(.otp-input-container--error)
+    input:hover:not(:focus):not(:disabled) {
+    border-color: var(--color-slate-400);
+  }
+
+  .btn-resend:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+
+  .btn-verify:hover:not(:disabled) {
+    filter: brightness(0.95);
+  }
+
+  .link-back:hover {
+    color: var(--color-slate-900);
+  }
+
+  .right-footer__link:hover {
+    text-decoration: underline;
+  }
 }
 
-.right-footer__separator {
-  color: #94a3b8;
+.btn-resend:focus-visible,
+.btn-verify:focus-visible,
+.link-back:focus-visible,
+.right-footer__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .otp-input-container input,
+  .btn-resend,
+  .btn-verify,
+  .link-back {
+    transition: none;
+  }
 }
 
 /* =========================
@@ -465,18 +556,16 @@ body {
 ========================= */
 
 @media (max-width: 768px) {
-  .right-auth-section {
+  .main-container {
     padding: 16px;
   }
 
   .header-top-bar {
-    height: 64px;
-
-    padding: 16px 20px;
+    padding: 0;
   }
 
   .logo-nexora-container {
-    padding: 0;
+    padding: 8px 0;
   }
 
   .center-card-otp-container {
@@ -484,12 +573,18 @@ body {
   }
 }
 
+/* Mobile nhỏ */
 @media (max-width: 480px) {
   .main-container {
-    width: 100%;
+    padding: 12px;
   }
+
+  .center-card-otp-container {
+    padding: 16px 0;
+  }
+
   .center-card-otp-form {
-    padding: 32px 20px;
+    padding: 28px 16px;
     gap: 24px;
     border-radius: 20px;
   }
@@ -502,5 +597,62 @@ body {
     height: 48px;
     font-size: 20px;
     border-radius: 10px;
+  }
+
+  /* Hàng gửi lại mã: căn giữa, xuống dòng gọn khi màn hình rất hẹp */
+  .resend-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 16px;
+  }
+
+  .btn-resend {
+    margin-left: 0;
+  }
+
+  .resend-text,
+  .btn-resend {
+    font-size: 13px;
+  }
+
+  /* Footer: bản quyền một dòng riêng, các link xếp hàng, bỏ dấu "•" */
+  /* Footer: copyright một dòng riêng, link xếp hàng bên dưới, bỏ dấu "•" */
+  .right-footer {
+    padding: 16px 0 8px;
+  }
+
+  .right-footer__container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .right-footer__text::after,
+  .right-footer__link + .right-footer__link::before {
+    display: none;
+  }
+
+  .right-footer__nav {
+    gap: 6px 16px;
+  }
+}
+
+/* Footer: khi không đủ chỗ cho 1 hàng thì tách copyright và link thành 2 hàng */
+@media (max-width: 640px) {
+  .right-footer {
+    padding: 16px 0 8px;
+  }
+
+  .right-footer__container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .right-footer__text::after,
+  .right-footer__link + .right-footer__link::before {
+    display: none;
+  }
+
+  .right-footer__nav {
+    gap: 6px 16px;
   }
 }
