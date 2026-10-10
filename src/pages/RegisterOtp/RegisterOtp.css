@@ -499,6 +499,7 @@
 .right-footer__link + .right-footer__link::before {
   content: "•";
   margin-right: 12px;
+  display: inline-block;
   color: var(--color-slate-400);
 }
 

@@ -1,0 +1,100 @@
+.stepper {
+  --stepper-done: #22c55e;
+  --stepper-circle: 32px;
+  --stepper-line: #e2e8f0;
+
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.stepper__item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Đường nối từ tâm vòng tròn này tới tâm vòng tròn kế tiếp */
+.stepper__item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--stepper-circle) / 2 - 1px);
+  left: calc(50% + var(--stepper-circle) / 2 + 6px);
+  width: calc(100% - var(--stepper-circle) - 12px);
+  height: 2px;
+  background: var(--stepper-line);
+}
+
+/* Bước đã xong thì đường nối phía sau cũng xanh */
+.stepper__item--done:not(:last-child)::after {
+  background: var(--stepper-done);
+}
+
+.stepper__circle {
+  width: var(--stepper-circle);
+  height: var(--stepper-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-slate-50, #f8fafc);
+  border: 1px solid var(--color-slate-200, #e2e8f0);
+  color: var(--color-slate-400, #94a3b8);
+
+  box-shadow:
+    0px 2px 4px -2px #0000001a,
+    0px 4px 6px -1px #0000001a,
+    0px 0px 0px 4px #ffffff;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.stepper__label {
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--color-slate-400, #94a3b8);
+}
+
+/* Đang ở bước này: màu thương hiệu */
+.stepper__item--active .stepper__circle {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 10px -2px
+    color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.stepper__item--active .stepper__label {
+  font-weight: 700;
+  color: var(--color-slate-900, #0f172a);
+}
+
+/* Đã hoàn thành: xanh + dấu tick */
+.stepper__item--done .stepper__circle {
+  background: var(--stepper-done);
+  border-color: var(--stepper-done);
+  color: #fff;
+}
+
+.stepper__item--done .stepper__label {
+  font-weight: 600;
+  color: var(--stepper-done);
+}
+
+@media (max-width: 480px) {
+  .stepper__label {
+    font-size: 10px;
+  }
+}
