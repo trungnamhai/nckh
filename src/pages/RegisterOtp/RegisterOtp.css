@@ -418,6 +418,10 @@
     transform var(--transition-fast);
 }
 
+.btn-verify i {
+  font-size: 10px;
+}
+
 .btn-verify:disabled {
   opacity: 0.6;
   box-shadow: none;
@@ -449,6 +453,10 @@
   color: var(--color-slate-500);
 
   transition: color var(--transition-fast);
+}
+
+.link-back i {
+  font-size: 10px;
 }
 
 /* =========================

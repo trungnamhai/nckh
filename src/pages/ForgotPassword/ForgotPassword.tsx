@@ -1,21 +1,23 @@
 import { useState, type SyntheticEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { forgotPassword } from "../../services/authService";
-
 import nexora from "../../assets/images/nexora.png";
 import Stepper from "../../components/auth/Stepper/Stepper";
 import { ROUTES } from "../../constants/routes";
 
 import "./ForgotPassword.css";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Regex không quay lui nhiều (tránh cảnh báo S8786)
+const EMAIL_REGEX = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
 const PHONE_REGEX = /^(0|\+84)\d{9}$/; // SĐT Việt Nam
 
 const MESSAGES = {
   empty: "Vui lòng nhập email hoặc số điện thoại",
   invalid: "Email hoặc số điện thoại không hợp lệ",
 };
+
+// Giả lập API, thay bằng lời gọi API thật khi backend sẵn sàng
+const MOCK_DELAY_MS = 500;
 
 export default function ForgotPasswordEmail() {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function ForgotPasswordEmail() {
 
   const currentYear = new Date().getFullYear();
 
-  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const value = contact.trim();
@@ -44,19 +46,13 @@ export default function ForgotPasswordEmail() {
     setError("");
     setIsSending(true);
 
-    try {
-      // Body theo Swagger: { "identifier": "..." }
-      await forgotPassword({ identifier: value });
-
-      // Thành công thì sang bước 2, truyền email/SĐT qua state
-      void navigate(ROUTES.FORGOT_PASSWORD_OTP, { state: { contact: value } });
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại",
-      );
-    } finally {
+    // Giả lập API gửi OTP
+    window.setTimeout(() => {
       setIsSending(false);
-    }
+
+      // Sang bước 2, truyền email/SĐT qua state
+      void navigate(ROUTES.FORGOT_PASSWORD_OTP, { state: { contact: value } });
+    }, MOCK_DELAY_MS);
   };
 
   return (
@@ -86,11 +82,7 @@ export default function ForgotPasswordEmail() {
               </div>
             </div>
 
-            <form
-              onSubmit={(e) => void handleSubmit(e)}
-              className="forgot-form"
-              noValidate
-            >
+            <form onSubmit={handleSubmit} className="forgot-form" noValidate>
               <div className="forgot-field">
                 <label htmlFor="contact" className="forgot-field__label">
                   EMAIL HOẶC SỐ ĐIỆN THOẠI{" "}
@@ -137,7 +129,9 @@ export default function ForgotPasswordEmail() {
                 disabled={isSending}
                 className="forgot-form__submit"
               >
-                {isSending ? "Đang gửi mã..." : "Tiếp tục gửi mã OTP"}
+                <span>
+                  {isSending ? "Đang gửi mã..." : "Tiếp tục gửi mã OTP"}
+                </span>
                 {!isSending && (
                   <i className="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 )}
@@ -145,7 +139,7 @@ export default function ForgotPasswordEmail() {
 
               <Link to="/login" className="forgot-form__back">
                 <i className="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                Quay lại Đăng nhập
+                <span>Quay lại Đăng nhập</span>
               </Link>
             </form>
           </div>
