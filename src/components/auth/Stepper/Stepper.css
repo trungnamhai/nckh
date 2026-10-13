@@ -1,6 +1,6 @@
 .stepper {
-  --stepper-done: #22c55e;
-  --stepper-circle: 32px;
+  --stepper-done: #10b981;
+  --stepper-circle: 36px;
   --stepper-line: #e2e8f0;
 
   width: 100%;
@@ -89,6 +89,10 @@
 }
 
 .stepper__item--done .stepper__label {
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.2px;
+
   font-weight: 600;
   color: var(--stepper-done);
 }
